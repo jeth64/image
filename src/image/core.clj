@@ -1,19 +1,34 @@
 (ns image.core
   (:require clojure.java.io)
   (:import (javax.imageio ImageIO)
-           (java.awt.image BufferedImage)) )
+           (java.awt.image BufferedImage)
+           (javax.swing JFrame)))
+
+; (defn getPixels [^BufferedImage image] (-> image .getRaster .getDataBuffer .getData))
+
+(defn imread [filename]
+  (javax.imageio.ImageIO/read (clojure.java.io/input-stream filename)))
+
+(def image (imread "/home/jasem/image/img/photo.jpg"))
+
+(type image)
+; (getPixels image)
+
+; (.getRGB image 0 0 (.getWidth image) (.getHeight image) java.null)
 
 
+(defn view [image]
+  (doto (javax.swing.JFrame. "Image")
+    (.add (proxy [javax.swing.JPanel] []
+            (paintComponent [g]
+                            (proxy-super paintComponent g)
+                            (.drawImage g image 0 0 this))))
+    (.setSize (.getWidth image) (.getHeight image))
+    (.setResizable false)
+    (.setVisible true)))
 
-;(with-open [input (new java.io.FileInputStream "../../photo.png")
-;;            output (new java.io.ByteArrayOutputStream)]
-;;(io/copy input output)
-;;(.toByteArray output))
 
-;(defn getPixels [^BufferedImage image] (-> image .getRaster .getDataBuffer .getData))
-
-
-(BufferedImage/toString (ImageIO/read (java.io.File. "../../photo.png")))
+(view image)
 
 
 ;; matrix functions

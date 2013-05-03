@@ -28,13 +28,6 @@
 
 ;; low-pass filter (blurring)
 
-(defn blockflt [n]
-  (take n (repeat (take n (repeat 1)))))
-
-(defn binomialflt [n]
-  (gaussian n))
-
-
 (defn gauss
   "Computes the normal distribution"
   [sigma x]
@@ -43,6 +36,7 @@
           (math/expt Math/E (/ (math/expt (/ x sigma) 2) 2)))))
 
 (defn gaussian
+  "Returns 1D gaussian filter for separated convolution"
   ([n] (gaussian 1 n))
   ([sigma n] (let [k (quot n 2)
                    x (range (inc k))
@@ -50,8 +44,12 @@
                    h (map #(math/round (/ % (last g))) g)]
                (concat (reverse (rest h)) h))))
 
-(gaussian 3)
+(defn binomialflt [n]
+  (gaussian n))
 
+
+(defn blockflt [n]
+  (take n (repeat (take n (repeat 1)))))
 
 
 ; separated low-pass filter
@@ -62,12 +60,14 @@
 (def binomialflt-sep [n]
   (gaussian-sep n))
 
+
 ; necessary follow-up
 
 (defn normfac
   "Returns the factor the pixel has to be multiplied with
    after applying a blurring-filter"
   [filter] (/ 1 (apply + (flatten filter))))
+
 
 ;; rank order function
 
@@ -114,6 +114,8 @@
 (defn v-conv-fnc [im f size]
   (map (partial apply map f)
        (partition size 1 im)))
+
+
 (defn conv-fnc
   "Convolution with a function for rank order filtering
    (conv-fnc I median 3) -> median filtering with size 3

@@ -54,6 +54,8 @@
 (defn hsv2grey [image]
   (map (partial map last) image))
 
+;; TODO hsv2rgb, check other transforms
+;; TODO implement tests
 
 ;; test image
 (def im1 (imread "/home/jasem/image/img/lena.jpg"))
